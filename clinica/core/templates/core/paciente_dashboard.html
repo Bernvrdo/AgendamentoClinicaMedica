@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>Painel do Paciente</h2>
+<div class="row">
+    <div class="col-md-4">
+        <h4>Médicos Disponíveis</h4>
+        <div class="list-group">
+            {% for medico in medicos %}
+            <a href="{% url 'agendar_consulta' medico.usuario.id %}" class="list-group-item list-group-item-action">
+                {{ medico.usuario.get_full_name }} - {{ medico.especialidade }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h4>Suas Consultas</h4>
+        <div class="list-group">
+            {% for consulta in consultas %}
+            <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Dr. {{ consulta.medico.get_full_name }}</h5>
+                    <small>{{ consulta.data }} às {{ consulta.horario }}</small>
+                </div>
+                <p class="mb-1">Status: {% if consulta.realizada %}Atendida{% else %}Agendada{% endif %}</p>
+                <p class="mb-1">{{ consulta.observacoes|default:"Nenhuma observação" }}</p>
+            </div>
+            {% empty %}
+            <div class="list-group-item">
+                Nenhuma consulta agendada
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

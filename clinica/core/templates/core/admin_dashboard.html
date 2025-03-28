@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>Painel Administrativo</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Ações Rápidas</h5>
+                <a href="{% url 'criar_usuario' %}" class="btn btn-success mb-3">
+                    <i class="bi bi-person-plus"></i> Criar Novo Usuário
+                </a>
+                <a href="/admin/" class="btn btn-secondary mb-2">Admin Django</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Estatísticas</h5>
+                <p>Usuários registrados: {{ usuarios.count }}</p>
+                <p>Médicos: {{ medicos_count }}</p>
+                <p>Pacientes: {{ pacientes_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Painel do Médico - Dr. {{ medico.usuario.get_full_name }}</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Configurar Agenda</div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label>Dias de Atendimento:</label>
+                            {{ form.dias_semana }}
+                        </div>
+                        <div class="mb-3">
+                            <label>Horários Disponíveis:</label>
+                            {{ form.horarios }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Agenda</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h4>Próximas Consultas</h4>
+            <!-- Mantenha o restante do template existente -->
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-check {
+        margin: 10px 0;
+    }
+    .form-check-label {
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
