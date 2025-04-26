@@ -1,36 +1,75 @@
 {% extends 'core/base.html' %}
-
+{% block title %}Painel do Paciente{% endblock %}
 {% block content %}
-<h2>Painel do Paciente</h2>
-<div class="row">
-    <div class="col-md-4">
-        <h4>Médicos Disponíveis</h4>
-        <div class="list-group">
-            {% for medico in medicos %}
-            <a href="{% url 'agendar_consulta' medico.usuario.id %}" class="list-group-item list-group-item-action">
-                {{ medico.usuario.get_full_name }} - {{ medico.especialidade }}
-            </a>
-            {% endfor %}
-        </div>
+<h2>Minhas Consultas</h2>
+<ul class="list-group mb-4">
+    {% for consulta in consultas %}
+        <li class="list-group-item">{{ consulta.data }} às {{ consulta.hora }} com {{ consulta.medico.username }}</li>
+    {% empty %}
+        <li class="list-group-item">Nenhuma consulta agendada.</li>
+    {% endfor %}
+</ul>
+
+<h3>Agendar Nova Consulta</h3>
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.medico.label_tag }} {{ form.medico }}
     </div>
-    <div class="col-md-8">
-        <h4>Suas Consultas</h4>
-        <div class="list-group">
-            {% for consulta in consultas %}
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">Dr. {{ consulta.medico.get_full_name }}</h5>
-                    <small>{{ consulta.data }} às {{ consulta.horario }}</small>
-                </div>
-                <p class="mb-1">Status: {% if consulta.realizada %}Atendida{% else %}Agendada{% endif %}</p>
-                <p class="mb-1">{{ consulta.observacoes|default:"Nenhuma observação" }}</p>
-            </div>
-            {% empty %}
-            <div class="list-group-item">
-                Nenhuma consulta agendada
-            </div>
-            {% endfor %}
-        </div>
+    <div id='calendar'></div>
+    <div class="mt-3">
+        <label for="id_hora">Horários disponíveis:</label>
+        <select name="hora" id="id_hora" class="form-select"></select>
     </div>
-</div>
+    <input type="hidden" name="data" id="id_data">
+    <button type="submit" class="btn btn-success mt-2">Agendar</button>
+</form>
+
+<script>
+    let medicoSelect = document.getElementById('id_medico');
+    let calendar;
+
+    function initCalendar(dias) {
+        let calendarEl = document.getElementById('calendar');
+        if (calendar) calendar.destroy();
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            selectable: true,
+            dateClick: function(info) {
+                let data = info.dateStr;
+                document.getElementById('id_data').value = data;
+
+                $.get('{% url "horarios_disponiveis" %}', {
+                    medico: medicoSelect.value,
+                    data: data
+                }, function(data) {
+                    const horaSelect = document.getElementById('id_hora');
+                    horaSelect.innerHTML = '';
+                    data.horarios.forEach(hora => {
+                        const option = document.createElement('option');
+                        option.value = hora;
+                        let [h, m] = hora.split(':');
+                        let proximaHora = (parseInt(h) + 1).toString().padStart(2, '0') + ':' + m;
+                        option.textContent = `${hora} – ${proximaHora}`;
+                        horaSelect.appendChild(option);
+                    });
+                });
+            },
+            events: dias.map(d => ({
+                title: 'Disponível',
+                start: d,
+                color: '#28a745'
+            }))
+        });
+        calendar.render();
+    }
+
+    medicoSelect.addEventListener('change', function() {
+        $.get('/api/dias_disponiveis/', { medico: medicoSelect.value }, function(response) {
+            initCalendar(response.dias);
+        });
+    });
+</script>
 {% endblock %}
