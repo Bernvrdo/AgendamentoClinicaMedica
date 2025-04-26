@@ -1,25 +1,53 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Sistema Clínico</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Consultas{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Clínica</a>
-            <div class="navbar-nav">
-                {% if user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                    <a class="nav-link" href="{% url 'custom_logout' %}">Sair</a>
-                {% else %}
-                    <a class="nav-link" href="{% url 'login' %}">Entrar</a>
-                {% endif %}
+<body class="container py-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 rounded shadow px-3">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-white" href="{% url 'home' %}">Consultas Médicas</a>
+
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        {% if user.tipo == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'admin_dashboard' %}">Painel Admin</a>
+                            </li>
+                        {% elif user.tipo == 'medico' %}
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'medico_dashboard' %}">Painel Médico</a>
+                            </li>
+                        {% elif user.tipo == 'paciente' %}
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="{% url 'paciente_dashboard' %}">Painel Paciente</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light ms-2" href="{% url 'logout' %}">Sair</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-light text-primary" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
-    <div class="container mt-4">
+
+
+    <main>
         {% block content %}{% endblock %}
-    </div>
+    </main>
 </body>
 </html>

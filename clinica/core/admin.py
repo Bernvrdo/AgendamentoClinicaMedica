@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import *
+from .models import User, Agenda, Consulta
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'user_type', 'first_name', 'last_name')
-    list_filter = ('user_type',)
+class UserAdmin(BaseUserAdmin):
+    fieldsets = BaseUserAdmin.fieldsets + (
+        (None, {'fields': ('tipo', 'especialidade')}),
+    )
 
-admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Medico)
-admin.site.register(Paciente)
+admin.site.register(User, UserAdmin)
+admin.site.register(Agenda)
 admin.site.register(Consulta)
